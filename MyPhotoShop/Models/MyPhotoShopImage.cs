@@ -21,6 +21,11 @@ public unsafe class MyPhotoShopImage
 
     public Span<byte> GetImage()
     {
-        return new(ImagePointer, Width * Height * 4);
+        return new(ImagePointer, GetImageSize());
+    }
+
+    public int GetImageSize()
+    {
+        return (Width * Height * 4);
     }
 }

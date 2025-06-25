@@ -1,19 +1,24 @@
 ﻿using System.Runtime.InteropServices;
+using MyPhotoShop.Logic;
 
 namespace MyPhotoShop
 {
     public unsafe class MonPhotoShop
     {
-               
-
         [UnmanagedCallersOnly(EntryPoint = "Grayscale")]
-        public static void Grayscale(void *ptr, int size)
+        public static void Grayscale()
         {
-            Span<byte> bytes = new (ptr, size);
+            if (MemoryManager.Image == null)
+            {
+                MyDebugger.Log("Image is empty");
+                return;
+            }
+
+            Span<byte> bytes = MemoryManager.Image.GetImage();
 
             int count = 0;
 
-            while (count < size)
+            while (count < MemoryManager.Image.GetImageSize())
             {
                 byte r = bytes[count];
                 byte g = bytes[count + 1];
