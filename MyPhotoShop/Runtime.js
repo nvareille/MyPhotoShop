@@ -2,49 +2,69 @@ var Module =
 {
     Canvas: null,
     Ctx: null,
+    ImagePtr: null,
     onRuntimeInitialized: () => {
         console.log("Chargé ma GL");
+        _SetDebug(true);
     
+        Canvas = document.getElementById("canvas");
+        Ctx = Canvas.getContext("2d");
+
         document.getElementById("LoadFile").addEventListener("change", Module.LoadFile);
         document.getElementById("grayscale").addEventListener("click", Module.Grayscale);
-        document.getElementById("canvas").addEventListener("mousedown", Module.HandleMousePosition); 
+        Canvas.addEventListener("mousedown", Module.HandleMousePosition); 
     },
     LoadFile: async (e) =>
     {
-        const canvas = document.getElementById("canvas")
-        const ctx = canvas.getContext("2d");
         const img = new Image();
         img.src = URL.createObjectURL(e.target.files[0]);
         await img.decode();
 
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
+        Canvas.width = img.width;
+        Canvas.height = img.height;
+        Ctx.drawImage(img, 0, 0);
+
+        Module.AllocImageAndSet();
     },
     Grayscale: () =>
     {
         console.log("Noir & blanc");
 
-        const canvas = document.getElementById("canvas")
-        const ctx = canvas.getContext("2d");
-
-        let buffer = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        let ptr = _malloc(canvas.width * canvas.height * 4);
+        let buffer = Ctx.getImageData(0, 0, Canvas.width, Canvas.height);
+        let ptr = _malloc(Canvas.width * Canvas.height * 4);
 
         HEAPU8.set(buffer.data, ptr);
 
-        _Grayscale(ptr, canvas.width * canvas.height * 4);
+        _Grayscale(ptr, Canvas.width * Canvas.height * 4);
 
-        let data = HEAPU8.subarray(ptr, ptr + canvas.width * canvas.height * 4);
+        let data = HEAPU8.subarray(ptr, ptr + Canvas.width * Canvas.height * 4);
         
         buffer.data.set(data);
-        ctx.putImageData(buffer, 0, 0);
+        Ctx.putImageData(buffer, 0, 0);
 
         _Free(ptr);
+    },
+    AllocImageAndSet: () =>
+    {
+        if (Module.ImagePtr != null)
+            _Free(Module.ImagePtr);
+
+        let buffer = Ctx.getImageData(0, 0, Canvas.width, Canvas.height);
+        let ptr = _malloc(Canvas.width * Canvas.height * 4);
+
+        HEAPU8.set(buffer.data, ptr);
+
+        Module.ImagePtr = ptr;
+        Module.SetImageData(ptr, Canvas.width, Canvas.height)
+    },
+    SetImageData: (ptr, x, y) =>
+    {
+        _LoadImage(ptr, x, y)
     },
     HandleMousePosition: (e) =>
     {
         getMousePosition(canvasElem, e);
     }
+
 };
 

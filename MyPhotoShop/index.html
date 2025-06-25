@@ -7,10 +7,23 @@
 
     <script defer type="text/javascript" src="Runtime.js"></script>
     <script defer type="text/javascript" src="bin/Release/net9.0/browser-wasm/publish/MyPhotoShop.js"></script>
+    <link href="style.css" rel="stylesheet"/>
 </head>
 <body>
-    <button id="grayscale">Grayscale</button>
-    <input type="file" id="LoadFile"/>
-    <canvas id="canvas"></canvas>
+    <div class="d-flex">
+        <div class="w-25">
+            Taille image
+        </div>
+        <div>
+            <div>
+                <button id="grayscale">Grayscale</button>
+                <input type="file" id="LoadFile" />
+            </div>
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
+    
+    
+    
 </body>
 </html>

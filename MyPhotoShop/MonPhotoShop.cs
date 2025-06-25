@@ -4,17 +4,7 @@ namespace MyPhotoShop
 {
     public unsafe class MonPhotoShop
     {
-        [UnmanagedCallersOnly(EntryPoint = "SayHello")]
-        public static void SayHello()
-        {
-            Console.WriteLine("Hello World");
-        }
-
-        [UnmanagedCallersOnly(EntryPoint = "GetTheNumber")]
-        public static int GetTheNumber()
-        {
-            return (42);
-        }
+               
 
         [UnmanagedCallersOnly(EntryPoint = "Grayscale")]
         public static void Grayscale(void *ptr, int size)
