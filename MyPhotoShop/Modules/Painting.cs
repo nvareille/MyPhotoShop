@@ -14,6 +14,12 @@ public static class Painting
 {
     private static Brush Brush = new Brush(5, Color.Red);
 
+    [UnmanagedCallersOnly(EntryPoint = "ChangeBrushColor")]
+    public static void ChangeBrushColor(int r, int g, int b)
+    {
+        Brush.Color = Color.FromArgb(r, g, b);
+    }
+
     [UnmanagedCallersOnly(EntryPoint = "ApplyPaint")]
     public static void ApplyPaint(int x, int y)
     {

@@ -14,6 +14,7 @@ var Module =
 
         document.getElementById("LoadFile").addEventListener("change", Module.LoadFile);
         document.getElementById("grayscale").addEventListener("click", Module.Grayscale);
+        document.getElementById("colorPicker").addEventListener("change", Module.ChangeBrushColor);
         Canvas.addEventListener("mousedown", Module.MouseDown);
         Canvas.addEventListener("mouseup", Module.MouseUp);
         Canvas.addEventListener("mousemove", Module.MoveMouse);
@@ -29,6 +30,15 @@ var Module =
         Ctx.drawImage(img, 0, 0);
 
         Module.AllocImageAndSet();
+    },
+    ChangeBrushColor(e)
+    {
+        let value = e.target.value.substring(1, 7);
+        let r = parseInt("0x" + value.substring(0, 2), 16);
+        let g = parseInt("0x" + value.substring(2, 4), 16);
+        let b = parseInt("0x" + value.substring(4, 6), 16);
+        
+        Module._ChangeBrushColor(r, g, b);
     },
     Grayscale: () =>
     {
