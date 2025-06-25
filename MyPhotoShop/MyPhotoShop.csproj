@@ -18,9 +18,5 @@
 	<ItemGroup>
 		<LinkerArg Include="-sEXPORTED_RUNTIME_METHODS=stringToNewUTF8" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Models\" />
-	</ItemGroup>
 	
 </Project>

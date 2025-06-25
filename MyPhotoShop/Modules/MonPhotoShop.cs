@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using MyPhotoShop.Logic;
 
-namespace MyPhotoShop
+namespace MyPhotoShop.Modules
 {
     public unsafe class MonPhotoShop
     {

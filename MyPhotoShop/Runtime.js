@@ -3,16 +3,20 @@ var Module =
     Canvas: null,
     Ctx: null,
     ImagePtr: null,
+    ImageData: null,
+    Painting: false,
     onRuntimeInitialized: () => {
         console.log("Chargé ma GL");
-        _SetDebug(true);
+        _SetDebug(false);
     
         Canvas = document.getElementById("canvas");
         Ctx = Canvas.getContext("2d");
 
         document.getElementById("LoadFile").addEventListener("change", Module.LoadFile);
         document.getElementById("grayscale").addEventListener("click", Module.Grayscale);
-        Canvas.addEventListener("mousedown", Module.HandleMousePosition); 
+        Canvas.addEventListener("mousedown", Module.MouseDown);
+        Canvas.addEventListener("mouseup", Module.MouseUp);
+        Canvas.addEventListener("mousemove", Module.MoveMouse);
     },
     LoadFile: async (e) =>
     {
@@ -38,10 +42,10 @@ var Module =
         if (Module.ImagePtr != null)
             _Free(Module.ImagePtr);
 
-        let buffer = Ctx.getImageData(0, 0, Canvas.width, Canvas.height);
+        Module.ImageData = Ctx.getImageData(0, 0, Canvas.width, Canvas.height);
         let ptr = _malloc(Canvas.width * Canvas.height * 4);
 
-        HEAPU8.set(buffer.data, ptr);
+        HEAPU8.set(Module.ImageData.data, ptr);
 
         Module.ImagePtr = ptr;
         Module.SetImageData(ptr, Canvas.width, Canvas.height)
@@ -55,19 +59,42 @@ var Module =
         if (Module.ImagePtr == null)
             return;
 
-        let buffer = Ctx.getImageData(0, 0, Canvas.width, Canvas.height);
         let data = HEAPU8.subarray(Module.ImagePtr, Module.ImagePtr + Canvas.width * Canvas.height * 4);
         
-        buffer.data.set(data);
-        Ctx.putImageData(buffer, 0, 0);
+        Module.ImageData.data.set(data);
+        Ctx.putImageData(Module.ImageData, 0, 0);
     },
-    HandleMousePosition: (e) =>
+    MousePosition(e)
     {
-        let rect = canvas.getBoundingClientRect();
-        let x = e.clientX - rect.left;
-        let y = e.clientY - rect.top;
+        let rect = Canvas.getBoundingClientRect();
+        let x = Math.round(e.clientX - rect.left);
+        let y = Math.round(e.clientY - rect.top);
+
+        return ({x, y});
+    },
+    MouseDown(e)
+    {
+        let pos = Module.MousePosition(e);
             
-        console.log(`${x} ${y}`);
+        Module.Painting = true;
+    },
+    MouseUp(e)
+    {
+        Module.Painting = false;
+    },
+    MoveMouse(e)
+    {
+        let pos = Module.MousePosition(e);
+
+        if (Module.Painting)
+        {
+            Module.ApplyPaint(pos)
+        }
+    },
+    ApplyPaint(pos)
+    {
+        Module._ApplyPaint(pos.x, pos.y);
+        Module.DisplayImage();
     }
 };
 

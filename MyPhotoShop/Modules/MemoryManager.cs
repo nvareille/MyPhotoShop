@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MyPhotoShop.Logic;
 
-namespace MyPhotoShop;
+namespace MyPhotoShop.Modules;
 
 public static unsafe class MemoryManager
 {

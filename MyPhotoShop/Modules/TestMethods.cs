@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyPhotoShop;
+namespace MyPhotoShop.Modules;
 
 public static unsafe class TestMethods
 {
@@ -18,6 +18,6 @@ public static unsafe class TestMethods
     [UnmanagedCallersOnly(EntryPoint = "GetTheNumber")]
     public static int GetTheNumber()
     {
-        return (42);
+        return 42;
     }
 }
