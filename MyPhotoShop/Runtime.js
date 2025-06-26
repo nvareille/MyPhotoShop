@@ -1,16 +1,21 @@
 var Module = 
 {
+    BufferCanvas: null,
+    BufferCtx: null,
     Canvas: null,
     Ctx: null,
-    ImagePtr: null,
-    ImageData: null,
+    ViewportPtr: null,
+    ViewportData: null,
     Painting: false,
+    Layers: [],
     onRuntimeInitialized: () => {
         console.log("Chargé ma GL");
-        _SetDebug(false);
+        _SetDebug(true);
     
         Module.Canvas = document.getElementById("canvas");
         Module.Ctx = Module.Canvas.getContext("2d");
+        Module.BufferCanvas = document.createElement("canvas");
+        Module.BufferCtx = Module.BufferCanvas.getContext("2d");
 
         document.getElementById("LoadFile").addEventListener("change", Module.LoadFile);
         document.getElementById("grayscale").addEventListener("click", Module.Grayscale);
@@ -26,11 +31,8 @@ var Module =
         img.src = URL.createObjectURL(e.target.files[0]);
         await img.decode();
 
-        Module.Canvas.width = img.width;
-        Module.Canvas.height = img.height;
-        Module.Ctx.drawImage(img, 0, 0);
-
-        Module.AllocImageAndSet();
+        Module.LoadImage(img);
+        Module.DisplayViewport();
     },
     ChangeBrushColor(e)
     {
@@ -48,18 +50,38 @@ var Module =
         _Grayscale();
         Module.DisplayImage();
     },
-    AllocImageAndSet: () =>
+    LoadImage(img)
     {
-        if (Module.ImagePtr != null)
-            _Free(Module.ImagePtr);
+        let x = img.width;
+        let y = img.height;
 
-        Module.ImageData = Module.Ctx.getImageData(0, 0, Module.Canvas.width, Module.Canvas.height);
-        let ptr = _malloc(Module.Canvas.width * Module.Canvas.height * 4);
+        Module.BufferCanvas.width = x;
+        Module.BufferCanvas.height = y;
+        Module.BufferCtx.drawImage(img, 0, 0);
+        let imageData = Module.BufferCtx.getImageData(0, 0, x, y);
+        let ptr = _malloc(x * y * 4);
 
-        HEAPU8.set(Module.ImageData.data, ptr);
+        HEAPU8.set(imageData.data, ptr);
 
-        Module.ImagePtr = ptr;
-        Module.SetImageData(ptr, Module.Canvas.width, Module.Canvas.height)
+        Module._LoadImage(ptr, x, y);
+    },
+    DisplayViewport()
+    {
+        let ptr = _GetViewport();
+        let x = _GetViewportSizeX();
+        let y = _GetViewportSizeY();
+
+        Module.Canvas.width = x;
+        Module.Canvas.height = y;
+
+        Module.ViewportData = Module.Ctx.getImageData(0, 0, x, y);
+
+        let b = HEAPU8.subarray(ptr, ptr + x * y * 4);
+
+        Module.ViewportData.data.set(b);
+
+        Module.Ctx.putImageData(Module.ViewportData, 0, 0);
+
     },
     SetImageData: (ptr, x, y) =>
     {
@@ -100,6 +122,7 @@ var Module =
         if (Module.Painting)
         {
             Module.ApplyPaint(pos)
+            Module.DisplayViewport();
         }
     },
     ApplyPaint(pos)
@@ -120,7 +143,10 @@ var Module =
             link.click();
             document.body.removeChild(link);
         }, 'image/png');
-        
+    },
+    CreateLayer(x, y)
+    {
+        _CreateLayer(x, y)
     }
 };
 

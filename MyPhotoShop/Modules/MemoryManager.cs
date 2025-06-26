@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace MyPhotoShop.Modules;
 
 public static unsafe class MemoryManager
 {
-    public static MyPhotoShopImage? Image;
+    public static LayerManager LayerManager = new ();
 
     [UnmanagedCallersOnly(EntryPoint = "SetDebug")]
     public static void LoadImage(bool enabled)
@@ -22,10 +23,19 @@ public static unsafe class MemoryManager
     }
 
     [UnmanagedCallersOnly(EntryPoint = "LoadImage")]
-    public static void LoadImage(void *ptr, int sizeX, int sizeY)
+    public static unsafe void LoadImage(void *ptr, int sizeX, int sizeY)
     {
-        Image = new MyPhotoShopImage(ptr, sizeX, sizeY);
+        Console.WriteLine("1 " + LayerManager.Layers.Count);
+        Layer l = LayerManager.CreateLayer(sizeX, sizeY);
+     
+        Span<byte> s = l.GetImage();
+        Span<byte> b = new(ptr, sizeX * sizeY * 4);
+
+        b.CopyTo(s);
+
         MyDebugger.Log("Image loaded " + sizeX + " " + sizeY);
+        Console.WriteLine(l.GetImage()[0]);
+        Console.WriteLine("2 " + LayerManager.Layers.Count);
     }
 
     [UnmanagedCallersOnly(EntryPoint = "Free")]

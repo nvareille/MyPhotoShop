@@ -13,7 +13,7 @@ public class Brush
         Color = color;
     }
 
-    public void Apply(MyPhotoShopImage image, int x, int y)
+    public void Apply(Layer image, int x, int y)
     {
         Span<byte> span = image.GetImage();
 

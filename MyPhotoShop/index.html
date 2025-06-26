@@ -6,14 +6,11 @@
     <title>Document</title>
 
     <script defer type="text/javascript" src="Runtime.js"></script>
-    <script defer type="text/javascript" src="bin/Release/net9.0/browser-wasm/publish/MyPhotoShop.js"></script>
+    <script defer type="text/javascript" src="bin/Debug/net9.0/browser-wasm/publish/MyPhotoShop.js"></script>
     <link href="style.css" rel="stylesheet"/>
 </head>
 <body>
     <div class="d-flex">
-        <div class="w-25">
-            Taille image
-        </div>
         <div>
             <div>
                 <div>
@@ -22,13 +19,13 @@
                 </div>
                 <button id="grayscale">Grayscale</button>
 
-                <input type="color" id="colorPicker"/>
+                <input type="color" id="colorPicker" />
             </div>
             <canvas id="canvas"></canvas>
         </div>
+        <div class="w-25">
+            Taille image
+        </div>
     </div>
-    
-    
-    
 </body>
 </html>

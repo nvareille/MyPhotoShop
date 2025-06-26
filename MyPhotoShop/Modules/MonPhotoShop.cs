@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using MyPhotoShop.Logic;
+using MyPhotoShop.Models;
 
 namespace MyPhotoShop.Modules
 {
@@ -8,17 +9,18 @@ namespace MyPhotoShop.Modules
         [UnmanagedCallersOnly(EntryPoint = "Grayscale")]
         public static void Grayscale()
         {
-            if (MemoryManager.Image == null)
+            if (MemoryManager.LayerManager.Layers.Count == 0)
             {
                 MyDebugger.Log("Image is empty");
                 return;
             }
 
-            Span<byte> bytes = MemoryManager.Image.GetImage();
+            Layer layer = MemoryManager.LayerManager.Layers.First();
+            Span<byte> bytes = layer.GetImage();
 
             int count = 0;
 
-            while (count < MemoryManager.Image.GetImageSize())
+            while (count < layer.GetImageSize())
             {
                 byte r = bytes[count];
                 byte g = bytes[count + 1];

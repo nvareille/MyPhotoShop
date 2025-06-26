@@ -24,6 +24,6 @@ public static class Painting
     public static void ApplyPaint(int x, int y)
     {
         MyDebugger.Log("Painting on " + x + " " + y);
-        Brush.Apply(MemoryManager.Image!, x, y);
+        Brush.Apply(MemoryManager.LayerManager.Layers.First()!, x, y);
     }
 }
