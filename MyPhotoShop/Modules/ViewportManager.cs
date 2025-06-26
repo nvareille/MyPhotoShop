@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using MyPhotoShop.Helpers;
 using MyPhotoShop.Logic;
 
 namespace MyPhotoShop.Modules;
@@ -18,8 +19,11 @@ public static class ViewportManager
     [UnmanagedCallersOnly(EntryPoint = "GetViewport")]
     public static unsafe IntPtr GetViewport()
     {
-        ComputeViewport();
+        
+        ComputeViewport(); 
         ApplyViewport();
+    
+        
 
         return ((IntPtr)Viewport!.ImagePointer);
     }
@@ -48,7 +52,6 @@ public static class ViewportManager
     {
         if (MemoryManager.LayerManager.Layers.Count == 0)
         {
-            Console.WriteLine("3");
             GenViewport(1, 1);
             return;
         }
@@ -62,13 +65,12 @@ public static class ViewportManager
         }
     }
 
-
     private static unsafe void GenViewport(int x, int y)
     {
         byte[] bytes = new byte[4 * x * y];
         void *ptr = Unsafe.AsPointer(ref bytes[0]);
 
         Viewport = new Layer(ptr, x, y);
-        Viewport.SSav = bytes;
+        Viewport.ImageRef = bytes;
     }
 }

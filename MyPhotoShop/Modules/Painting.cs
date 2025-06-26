@@ -23,7 +23,7 @@ public static class Painting
     [UnmanagedCallersOnly(EntryPoint = "ApplyPaint")]
     public static void ApplyPaint(int x, int y)
     {
-        MyDebugger.Log("Painting on " + x + " " + y);
-        Brush.Apply(MemoryManager.LayerManager.Layers.First()!, x, y);
+        //MyDebugger.Log("Painting on " + x + " " + y);
+        Brush.Apply(MemoryManager.LayerManager.Layers.Last(), x, y);
     }
 }

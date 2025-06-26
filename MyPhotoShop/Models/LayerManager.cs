@@ -11,11 +11,6 @@ public class LayerManager
 {
     public List<Layer> Layers = new ();
 
-    public LayerManager()
-    {
-        Console.WriteLine("CTR");
-    }
-
     public unsafe Layer CreateLayer(void *ptr, int x, int y)
     {
         int id = 1;
@@ -34,7 +29,7 @@ public class LayerManager
     {
         Layer l = CreateLayer(Unsafe.AsPointer(ref ptr[0]), x, y);
 
-        l.SSav = ptr;
+        l.ImageRef = ptr;
         return (l);
     }
 

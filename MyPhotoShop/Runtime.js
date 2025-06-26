@@ -8,6 +8,7 @@ var Module =
     ViewportData: null,
     Painting: false,
     Layers: [],
+    ViewportSize: {x: 0, y:0},
     onRuntimeInitialized: () => {
         console.log("Chargé ma GL");
         _SetDebug(true);
@@ -24,6 +25,8 @@ var Module =
         Module.Canvas.addEventListener("mousedown", Module.MouseDown);
         Module.Canvas.addEventListener("mouseup", Module.MouseUp);
         Module.Canvas.addEventListener("mousemove", Module.MoveMouse);
+
+        setInterval(() => Module.DisplayViewport(), 10);
     },
     LoadFile: async (e) =>
     {
@@ -45,16 +48,14 @@ var Module =
     },
     Grayscale: () =>
     {
-        console.log("Noir & blanc");
-
         _Grayscale();
-        Module.DisplayImage();
+        Module.DisplayViewport();
     },
     LoadImage(img)
     {
         let x = img.width;
         let y = img.height;
-
+        
         Module.BufferCanvas.width = x;
         Module.BufferCanvas.height = y;
         Module.BufferCtx.drawImage(img, 0, 0);
@@ -67,35 +68,30 @@ var Module =
     },
     DisplayViewport()
     {
+        console.log("Rendu");
         let ptr = _GetViewport();
         let x = _GetViewportSizeX();
         let y = _GetViewportSizeY();
 
-        Module.Canvas.width = x;
-        Module.Canvas.height = y;
+        if (Module.ViewportSize.x != x || Module.ViewportSize.y != y)
+        {
+            console.log("resize");
+            Module.Canvas.width = x;
+            Module.Canvas.height = y;
+            Module.ViewportSize = {x: x, y: y};
 
-        Module.ViewportData = Module.Ctx.getImageData(0, 0, x, y);
-
+            Module.ViewportData = new ImageData(x, y);
+        }
+        
         let b = HEAPU8.subarray(ptr, ptr + x * y * 4);
 
         Module.ViewportData.data.set(b);
 
         Module.Ctx.putImageData(Module.ViewportData, 0, 0);
-
     },
     SetImageData: (ptr, x, y) =>
     {
         _LoadImage(ptr, x, y)
-    },
-    DisplayImage: () =>
-    {
-        if (Module.ImagePtr == null)
-            return;
-
-        let data = HEAPU8.subarray(Module.ImagePtr, Module.ImagePtr + Module.Canvas.width * Module.Canvas.height * 4);
-        
-        Module.ImageData.data.set(data);
-        Module.Ctx.putImageData(Module.ImageData, 0, 0);
     },
     MousePosition(e)
     {
@@ -122,13 +118,12 @@ var Module =
         if (Module.Painting)
         {
             Module.ApplyPaint(pos)
-            Module.DisplayViewport();
         }
     },
     ApplyPaint(pos)
     {
         Module._ApplyPaint(pos.x, pos.y);
-        Module.DisplayImage();
+        Module.DisplayViewport();
     },
     SaveImage()
     {
@@ -138,7 +133,6 @@ var Module =
             link.href = URL.createObjectURL(blob);
             link.download = "image.png";
 
-            // Pour déclencher automatiquement le téléchargement
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

@@ -25,7 +25,6 @@ public static unsafe class MemoryManager
     [UnmanagedCallersOnly(EntryPoint = "LoadImage")]
     public static unsafe void LoadImage(void *ptr, int sizeX, int sizeY)
     {
-        Console.WriteLine("1 " + LayerManager.Layers.Count);
         Layer l = LayerManager.CreateLayer(sizeX, sizeY);
      
         Span<byte> s = l.GetImage();
@@ -34,8 +33,6 @@ public static unsafe class MemoryManager
         b.CopyTo(s);
 
         MyDebugger.Log("Image loaded " + sizeX + " " + sizeY);
-        Console.WriteLine(l.GetImage()[0]);
-        Console.WriteLine("2 " + LayerManager.Layers.Count);
     }
 
     [UnmanagedCallersOnly(EntryPoint = "Free")]

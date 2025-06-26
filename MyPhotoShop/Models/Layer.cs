@@ -10,7 +10,7 @@ namespace MyPhotoShop.Models;
 public unsafe class Layer
 {
     public void* ImagePointer;
-    public byte[] SSav;
+    public byte[]? ImageRef;
     public int Width;
     public int Height;
     public int Id;
@@ -29,7 +29,7 @@ public unsafe class Layer
 
     public int GetImageSize()
     {
-        MyDebugger.Log("Size is " + Width * Height * 4);
+        //MyDebugger.Log("Size is " + Width * Height * 4);
         return (Width * Height * 4);
     }
 
@@ -39,8 +39,7 @@ public unsafe class Layer
         Span<byte> src = layer.GetImage();
         Span<byte> dst = GetImage();
 
-        src.CopyTo(dst);
-        /*while (x < layer.Width)
+        while (x < layer.Width)
         {
             int y = 0;
             
@@ -58,6 +57,6 @@ public unsafe class Layer
             }
 
             ++x;
-        }*/
+        }
     }
 }
