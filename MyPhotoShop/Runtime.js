@@ -9,15 +9,16 @@ var Module =
         console.log("Chargé ma GL");
         _SetDebug(false);
     
-        Canvas = document.getElementById("canvas");
-        Ctx = Canvas.getContext("2d");
+        Module.Canvas = document.getElementById("canvas");
+        Module.Ctx = Module.Canvas.getContext("2d");
 
         document.getElementById("LoadFile").addEventListener("change", Module.LoadFile);
         document.getElementById("grayscale").addEventListener("click", Module.Grayscale);
         document.getElementById("colorPicker").addEventListener("change", Module.ChangeBrushColor);
-        Canvas.addEventListener("mousedown", Module.MouseDown);
-        Canvas.addEventListener("mouseup", Module.MouseUp);
-        Canvas.addEventListener("mousemove", Module.MoveMouse);
+        document.getElementById("saveImage").addEventListener("click", Module.SaveImage)
+        Module.Canvas.addEventListener("mousedown", Module.MouseDown);
+        Module.Canvas.addEventListener("mouseup", Module.MouseUp);
+        Module.Canvas.addEventListener("mousemove", Module.MoveMouse);
     },
     LoadFile: async (e) =>
     {
@@ -25,9 +26,9 @@ var Module =
         img.src = URL.createObjectURL(e.target.files[0]);
         await img.decode();
 
-        Canvas.width = img.width;
-        Canvas.height = img.height;
-        Ctx.drawImage(img, 0, 0);
+        Module.Canvas.width = img.width;
+        Module.Canvas.height = img.height;
+        Module.Ctx.drawImage(img, 0, 0);
 
         Module.AllocImageAndSet();
     },
@@ -52,13 +53,13 @@ var Module =
         if (Module.ImagePtr != null)
             _Free(Module.ImagePtr);
 
-        Module.ImageData = Ctx.getImageData(0, 0, Canvas.width, Canvas.height);
-        let ptr = _malloc(Canvas.width * Canvas.height * 4);
+        Module.ImageData = Module.Ctx.getImageData(0, 0, Module.Canvas.width, Module.Canvas.height);
+        let ptr = _malloc(Module.Canvas.width * Module.Canvas.height * 4);
 
         HEAPU8.set(Module.ImageData.data, ptr);
 
         Module.ImagePtr = ptr;
-        Module.SetImageData(ptr, Canvas.width, Canvas.height)
+        Module.SetImageData(ptr, Module.Canvas.width, Module.Canvas.height)
     },
     SetImageData: (ptr, x, y) =>
     {
@@ -69,14 +70,14 @@ var Module =
         if (Module.ImagePtr == null)
             return;
 
-        let data = HEAPU8.subarray(Module.ImagePtr, Module.ImagePtr + Canvas.width * Canvas.height * 4);
+        let data = HEAPU8.subarray(Module.ImagePtr, Module.ImagePtr + Module.Canvas.width * Module.Canvas.height * 4);
         
         Module.ImageData.data.set(data);
-        Ctx.putImageData(Module.ImageData, 0, 0);
+        Module.Ctx.putImageData(Module.ImageData, 0, 0);
     },
     MousePosition(e)
     {
-        let rect = Canvas.getBoundingClientRect();
+        let rect = Module.Canvas.getBoundingClientRect();
         let x = Math.round(e.clientX - rect.left);
         let y = Math.round(e.clientY - rect.top);
 
@@ -105,6 +106,21 @@ var Module =
     {
         Module._ApplyPaint(pos.x, pos.y);
         Module.DisplayImage();
+    },
+    SaveImage()
+    {
+        Module.Canvas.toBlob(blob => 
+        {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = "image.png";
+
+            // Pour déclencher automatiquement le téléchargement
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }, 'image/png');
+        
     }
 };
 
